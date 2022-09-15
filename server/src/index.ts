@@ -9,6 +9,11 @@ import { buildSchema } from 'type-graphql'
 import { HelloResolver } from './resolvers/hello'
 import {ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core'
 import { UserResolver } from './resolvers/user'
+import mongoose from 'mongoose'
+import MongoStore from 'connect-mongo'
+import session from 'express-session'
+import { COOKIE_NAME, __prod__ } from './constants'
+import { Context } from './types/Context'
 
 const main =async () => {
     await createConnection({
@@ -23,9 +28,33 @@ const main =async () => {
 
     const app = express()
 
+    const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@retdit.vhubszd.mongodb.net/?retryWrites=true&w=majority`
+    // Session/Cookie store
+    await mongoose.connect(mongoUrl)
+
+    console.log('MongoDB Connected');
+
+    app.use(
+		session({
+			name: COOKIE_NAME,
+			store: MongoStore.create({ mongoUrl }),
+			cookie: {
+				maxAge: 1000 * 60 * 60, // one hour
+				httpOnly: true, // JS front end cannot access the cookie
+				secure: __prod__, // cookie only works in https
+				sameSite: 'lax'
+			},
+			secret: process.env.SESSION_SECRET_DEV_PROD as string,
+			saveUninitialized: false, // don't save empty sessions, right from the start
+			resave: false
+		})
+	)
+      
+
     const apolloServer = new ApolloServer({
         schema: await buildSchema({ resolvers: [HelloResolver, UserResolver], validate: false }),
-        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
+        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+        context: ({ req, res }) : Context => ({ req, res })
     })
 
     await apolloServer.start()
