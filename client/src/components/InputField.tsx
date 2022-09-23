@@ -17,6 +17,7 @@ const InputField = (props: InputFieldProps) => {
                 {props.label}
             </FormLabel>
             <Input
+                {...field}
                 id={field.name}
                 placeholder={props.placeholder}
             />

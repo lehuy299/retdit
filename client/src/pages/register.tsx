@@ -1,6 +1,7 @@
-import { Box, FormControl, FormLabel, Input } from '@chakra-ui/react'
+import { Box, Button, FormControl, FormLabel, Input } from '@chakra-ui/react'
 import { Formik, Form } from 'formik'
 import React from 'react'
+import InputField from '../components/InputField'
 import Wrapper from '../components/Wrapper'
 
 const Register = () => {
@@ -8,18 +9,22 @@ const Register = () => {
     <Wrapper>
         <Formik initialValues={{ username: '', password: '' }} onSubmit={values => console.log(values)
         }>
-            {({ values, handleChange }) => (
+            {({ isSubmitting }) => (
                 <Form>
                     <FormControl>
-                        <FormLabel htmlFor='username'>
-                            Username
-                        </FormLabel>
-                        <Input  
-                            id='username'
+                        <InputField
+                            name='username'
+                            label='username'
                             placeholder='Username'
-                            value={values.username}
-                            onChange={handleChange}
                         />
+                        <InputField
+                            name='password'
+                            label='password'
+                            placeholder='Password'
+                        />
+                        <Button type='submit' colorScheme='teal' mt={4} isLoading={isSubmitting}>
+                            Register
+                        </Button>
                     </FormControl>
                 </Form>
             )}
