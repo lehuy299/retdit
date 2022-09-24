@@ -5,7 +5,8 @@ import React from 'react'
 interface InputFieldProps {
     name: string,
     label: string,
-    placeholder: string
+    placeholder: string,
+    type: string
 }
 
 const InputField = (props: InputFieldProps) => {
@@ -18,8 +19,7 @@ const InputField = (props: InputFieldProps) => {
             </FormLabel>
             <Input
                 {...field}
-                id={field.name}
-                placeholder={props.placeholder}
+                {...props}
             />
             {error && <FormErrorMessage>{error}</FormErrorMessage>}
         </FormControl>
